@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oefen App - Frans</title>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Urbanist', sans-serif;
+      background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      min-height: 100vh;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* Animated background particles */
+    .bg-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      animation: float 20s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      25% { transform: translateY(-30px) translateX(20px); }
+      50% { transform: translateY(-60px) translateX(-20px); }
+      75% { transform: translateY(-30px) translateX(30px); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .page {
+      display: none;
+      width: 100%;
+      max-width: 900px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Login Page */
+    .login-box {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 30px;
+      padding: 60px 50px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 3.5rem;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.7;
+      margin-bottom: 40px;
+      font-weight: 400;
+    }
+
+    .input-group {
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.8;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      color: #fff;
+      font-size: 1.1rem;
+      font-family: 'Urbanist', sans-serif;
+      transition: all 0.3s;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: #f5576c;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 0 4px rgba(245, 87, 108, 0.15);
+    }
+
+    .input-group input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: #fff;
+      border: none;
+      padding: 16px 50px;
+      border-radius: 15px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(245, 87, 108, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    /* Subject Selection */
+    .subjects-container {
+      text-align: center;
+    }
+
+    .welcome-text {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      font-family: 'DM Serif Display', serif;
+    }
+
+    .select-prompt {
+      font-size: 1.2rem;
+      opacity: 0.7;
+      margin-bottom: 50px;
+    }
+
+    .subjects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .subject-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 25px;
+      padding: 50px 30px;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .subject-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(240, 147, 251, 0.1), rgba(245, 87, 108, 0.1));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .subject-card:hover {
+      transform: translateY(-8px);
+      border-color: #f5576c;
+      box-shadow: 0 20px 50px rgba(245, 87, 108, 0.3);
+    }
+
+    .subject-card:hover::before {
+      opacity: 1;
+    }
+
+    .subject-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .subject-name {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .subject-desc {
+      font-size: 0.95rem;
+      opacity: 0.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Flashcard Game */
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 20px 30px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .user-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .progress-container {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 20px 30px;
+      margin-bottom: 30px;
+    }
+
+    .progress-bar-wrapper {
+      width: 100%;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #f093fb, #f5576c);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+    }
+
+    .progress-text {
+      font-size: 0.95rem;
+      opacity: 0.7;
+      text-align: center;
+    }
+
+    .flashcard-container {
+      margin-bottom: 30px;
+      min-height: 280px;
+      position: relative;
+    }
+
+    .flashcard {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 25px;
+      padding: 50px 40px;
+      text-align: center;
+      cursor: pointer;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .flashcard.slide-out-left {
+      transform: translateX(-80px);
+      opacity: 0;
+    }
+
+    .flashcard.slide-out-right {
+      transform: translateX(80px);
+      opacity: 0;
+    }
+
+    .lang-badge {
+      position: absolute;
+      top: 20px;
+      left: 25px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 6px 14px;
+      background: rgba(245, 87, 108, 0.2);
+      border: 1px solid rgba(245, 87, 108, 0.4);
+      border-radius: 20px;
+    }
+
+    .card-word {
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 15px;
+    }
+
+    .card-hint {
+      font-size: 0.9rem;
+      opacity: 0.5;
+    }
+
+    .answer-word {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #4ecca3;
+      line-height: 1.3;
+    }
+
+    .controls {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .btn-show {
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      padding: 14px 40px;
+      border-radius: 15px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-show:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .btn-wrong, .btn-correct {
+      padding: 14px 35px;
+      border: none;
+      border-radius: 15px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      min-width: 140px;
+    }
+
+    .btn-wrong {
+      background: linear-gradient(135deg, #e94560, #c23152);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(233, 69, 96, 0.3);
+    }
+
+    .btn-wrong:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(233, 69, 96, 0.4);
+    }
+
+    .btn-correct {
+      background: linear-gradient(135deg, #4ecca3, #38a88a);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(78, 204, 163, 0.3);
+    }
+
+    .btn-correct:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(78, 204, 163, 0.4);
+    }
+
+    .keyboard-hint {
+      text-align: center;
+      font-size: 0.85rem;
+      opacity: 0.4;
+      margin-top: 20px;
+    }
+
+    /* Results */
+    .results-box {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 30px;
+      padding: 60px 50px;
+      text-align: center;
+    }
+
+    .results-icon {
+      font-size: 5rem;
+      margin-bottom: 20px;
+    }
+
+    .results-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 15px;
+      font-family: 'DM Serif Display', serif;
+    }
+
+    .results-stats {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      opacity: 0.8;
+    }
+
+    .stats-bar {
+      display: flex;
+      border-radius: 15px;
+      overflow: hidden;
+      height: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stats-correct {
+      background: #4ecca3;
+      transition: width 0.8s;
+    }
+
+    .stats-wrong {
+      background: #e94560;
+      flex: 1;
+    }
+
+    .btn-restart {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: #fff;
+      border: none;
+      padding: 16px 50px;
+      border-radius: 15px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3);
+    }
+
+    .btn-restart:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(245, 87, 108, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      .login-box, .results-box {
+        padding: 40px 30px;
+      }
+
+      .logo {
+        font-size: 2.5rem;
+      }
+
+      .subjects-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .game-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+
+      .flashcard {
+        padding: 40px 25px;
+        min-height: 240px;
+      }
+
+      .card-word, .answer-word {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background particles -->
+  <div class="bg-particles" id="particles"></div>
+
+  <div class="container">
+    <!-- PAGE 1: Login -->
+    <div class="page active" id="loginPage">
+      <div class="login-box">
+        <div class="logo">Oefen App</div>
+        <div class="subtitle">Leer slim, oefen snel</div>
+        
+        <div class="input-group">
+          <label for="className">Klas Naam</label>
+          <input type="text" id="className" placeholder="Bijv. 3A, 4B, etc." autofocus>
+        </div>
+        
+        <button class="btn" onclick="goToSubjects()">Start</button>
+      </div>
+    </div>
+
+    <!-- PAGE 2: Subject Selection -->
+    <div class="page" id="subjectsPage">
+      <div class="subjects-container">
+        <div class="welcome-text">Welkom, <span id="displayName"></span>!</div>
+        <div class="select-prompt">Kies een vak om te oefenen</div>
+        
+        <div class="subjects-grid">
+          <div class="subject-card" onclick="startFrans()">
+            <div class="subject-icon">🇫🇷</div>
+            <div class="subject-name">Frans</div>
+            <div class="subject-desc">16 woorden • Nederlands → Frans</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 3: Flashcard Game -->
+    <div class="page" id="gamePage">
+      <div class="game-header">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar"></div>
+          <div class="user-name" id="userName"></div>
+        </div>
+        <div style="font-size: 1.5rem;">🇫🇷</div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-bar-wrapper">
+          <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+        </div>
+        <div class="progress-text" id="progressText">0 / 16</div>
+      </div>
+
+      <div class="flashcard-container">
+        <div class="flashcard" id="flashcard" onclick="flipCard()">
+          <div class="lang-badge" id="langBadge">🇳🇱 Nederlands</div>
+          <div id="cardContent">
+            <div class="card-word" id="cardWord">Engels</div>
+            <div class="card-hint">Klik om antwoord te zien</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls" id="controls">
+        <button class="btn-show" onclick="flipCard()">Toon Antwoord</button>
+      </div>
+
+      <div class="keyboard-hint" id="keyboardHint">Spatie: Omdraaien</div>
+    </div>
+
+    <!-- PAGE 4: Results -->
+    <div class="page" id="resultsPage">
+      <div class="results-box">
+        <div class="results-icon" id="resultsIcon">🎉</div>
+        <div class="results-title">Goed gedaan!</div>
+        <div class="results-stats" id="resultsStats">
+          Je hebt <strong style="color: #4ecca3;">12</strong> juist en 
+          <strong style="color: #e94560;">4</strong> verkeerd.
+        </div>
+        <div class="stats-bar">
+          <div class="stats-correct" id="statsCorrect" style="width: 75%"></div>
+          <div class="stats-wrong"></div>
+        </div>
+        <button class="btn-restart" onclick="restartGame()">Opnieuw Spelen</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Create background particles
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 15; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.width = `${Math.random() * 80 + 40}px`;
+      particle.style.height = particle.style.width;
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.top = `${Math.random() * 100}%`;
+      particle.style.animationDelay = `${Math.random() * 20}s`;
+      particle.style.animationDuration = `${Math.random() * 15 + 15}s`;
+      particlesContainer.appendChild(particle);
+    }
+
+    // Vocabulary data
+    const VOCAB = [
+      { nl: "Engels", fr: "l'anglais" },
+      { nl: "Frans", fr: "le français" },
+      { nl: "Nederlands", fr: "le néerlandais" },
+      { nl: "wiskunde", fr: "les maths" },
+      { nl: "aardrijkskunde", fr: "la géographie" },
+      { nl: "geschiedenis", fr: "l'histoire" },
+      { nl: "tekenen", fr: "le dessin" },
+      { nl: "gym", fr: "la gym" },
+      { nl: "de toets", fr: "le contrôle" },
+      { nl: "makkelijk", fr: "facile" },
+      { nl: "moeilijk", fr: "difficile" },
+      { nl: "sterk, goed", fr: "fort(e)" },
+      { nl: "echt", fr: "vraiment" },
+      { nl: "de school", fr: "l'école" },
+      { nl: "beginnen", fr: "commencer" },
+      { nl: "lachen, lol maken", fr: "rigoler" },
+    ];
+
+    // Game state
+    let userName = '';
+    let deck = [];
+    let currentIndex = 0;
+    let flipped = false;
+    let score = { correct: 0, wrong: 0 };
+    let wrongCards = [];
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+    }
+
+    function goToSubjects() {
+      const input = document.getElementById('className').value.trim();
+      if (!input) {
+        alert('Vul je klas naam in!');
+        return;
+      }
+      userName = input;
+      document.getElementById('displayName').textContent = userName;
+      showPage('subjectsPage');
+    }
+
+    function startFrans() {
+      deck = shuffle([...VOCAB]);
+      currentIndex = 0;
+      flipped = false;
+      score = { correct: 0, wrong: 0 };
+      wrongCards = [];
+      
+      document.getElementById('userName').textContent = userName;
+      document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+      
+      showPage('gamePage');
+      showCard();
+    }
+
+    function showCard() {
+      const card = deck[currentIndex];
+      flipped = false;
+      
+      document.getElementById('cardWord').textContent = card.nl;
+      document.getElementById('langBadge').innerHTML = '🇳🇱 Nederlands';
+      document.getElementById('cardContent').innerHTML = `
+        <div class="card-word">${card.nl}</div>
+        <div class="card-hint">Klik om antwoord te zien</div>
+      `;
+      
+      document.getElementById('controls').innerHTML = '<button class="btn-show" onclick="flipCard()">Toon Antwoord</button>';
+      document.getElementById('keyboardHint').textContent = 'Spatie: Omdraaien';
+      
+      const progress = ((currentIndex) / deck.length) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+      document.getElementById('progressText').textContent = `${currentIndex + 1} / ${deck.length}`;
+      
+      document.getElementById('flashcard').classList.remove('slide-out-left', 'slide-out-right');
+    }
+
+    function flipCard() {
+      if (flipped) return;
+      flipped = true;
+      
+      const card = deck[currentIndex];
+      document.getElementById('langBadge').innerHTML = '🇫🇷 Frans';
+      document.getElementById('cardContent').innerHTML = `<div class="answer-word">${card.fr}</div>`;
+      
+      document.getElementById('controls').innerHTML = `
+        <button class="btn-wrong" onclick="answerWrong()">✕ Verkeerd</button>
+        <button class="btn-correct" onclick="answerCorrect()">✓ Juist</button>
+      `;
+      document.getElementById('keyboardHint').textContent = '← Verkeerd  |  → Juist';
+    }
+
+    function answerWrong() {
+      const flashcard = document.getElementById('flashcard');
+      flashcard.classList.add('slide-out-left');
+      
+      score.wrong++;
+      wrongCards.push(deck[currentIndex]);
+      
+      setTimeout(nextCard, 350);
+    }
+
+    function answerCorrect() {
+      const flashcard = document.getElementById('flashcard');
+      flashcard.classList.add('slide-out-right');
+      
+      score.correct++;
+      
+      setTimeout(nextCard, 350);
+    }
+
+    function nextCard() {
+      currentIndex++;
+      
+      if (currentIndex >= deck.length) {
+        // Check if we need to retry wrong cards
+        if (wrongCards.length > 0) {
+          deck = shuffle([...wrongCards]);
+          wrongCards = [];
+          currentIndex = 0;
+          showCard();
+        } else {
+          showResults();
+        }
+      } else {
+        showCard();
+      }
+    }
+
+    function showResults() {
+      const total = score.correct + score.wrong;
+      const percentage = (score.correct / total) * 100;
+      
+      let icon = '🎉';
+      if (percentage >= 80) icon = '🎉';
+      else if (percentage >= 50) icon = '👍';
+      else icon = '📚';
+      
+      document.getElementById('resultsIcon').textContent = icon;
+      document.getElementById('resultsStats').innerHTML = `
+        Je hebt <strong style="color: #4ecca3;">${score.correct}</strong> juist en 
+        <strong style="color: #e94560;">${score.wrong}</strong> verkeerd.
+      `;
+      
+      document.getElementById('statsCorrect').style.width = percentage + '%';
+      
+      showPage('resultsPage');
+    }
+
+    function restartGame() {
+      showPage('subjectsPage');
+    }
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      const currentPage = document.querySelector('.page.active').id;
+      
+      if (currentPage === 'loginPage' && e.key === 'Enter') {
+        goToSubjects();
+      }
+      
+      if (currentPage === 'gamePage') {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          if (!flipped) flipCard();
+        }
+        
+        if (flipped) {
+          if (e.key === 'ArrowLeft') answerWrong();
+          if (e.key === 'ArrowRight') answerCorrect();
+        }
+      }
+      
+      if (currentPage === 'resultsPage' && e.key === 'Enter') {
+        restartGame();
+      }
+    });
+  </script>
+</body>
+</html>
